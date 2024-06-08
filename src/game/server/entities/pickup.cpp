@@ -22,6 +22,8 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType, int Layer, int N
 	m_Layer = Layer;
 	m_Number = Number;
 
+	m_SpawnTick = -1;
+
 	GameWorld()->InsertEntity(this);
 }
 
@@ -32,6 +34,20 @@ void CPickup::Reset()
 
 void CPickup::Tick()
 {
+	if(m_SpawnTick > 0)
+	{
+		if(Server()->Tick() > m_SpawnTick)
+		{
+			// respawn
+			m_SpawnTick = -1;
+
+			if(m_Type == POWERUP_WEAPON)
+				GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SPAWN);
+		}
+		else
+			return;
+	}
+
 	Move();
 
 	// Check if a player intersected us
@@ -40,6 +56,8 @@ void CPickup::Tick()
 	for(int i = 0; i < Num; ++i)
 	{
 		auto *pChr = static_cast<CCharacter *>(apEnts[i]);
+
+		int RespawnTime = -1;
 
 		if(pChr && pChr->IsAlive())
 		{
@@ -50,32 +68,43 @@ void CPickup::Tick()
 			switch(m_Type)
 			{
 			case POWERUP_HEALTH:
-				if(pChr->Freeze())
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, pChr->TeamMask());
+				// if(pChr->Freeze())
+				// 	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, pChr->TeamMask());
+				if(pChr->IncreaseHealth(1))
+				{
+					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+					RespawnTime = 50; //todo, not hardcode >:(
+				}
 				break;
 
 			case POWERUP_ARMOR:
-				if(pChr->Team() == TEAM_SUPER)
-					continue;
-				for(int j = WEAPON_SHOTGUN; j < NUM_WEAPONS; j++)
+				// if(pChr->Team() == TEAM_SUPER)
+				// 	continue;
+				// for(int j = WEAPON_SHOTGUN; j < NUM_WEAPONS; j++)
+				// {
+				// 	if(pChr->GetWeaponGot(j))
+				// 	{
+				// 		pChr->SetWeaponGot(j, false);
+				// 		pChr->SetWeaponAmmo(j, 0);
+				// 		Sound = true;
+				// 	}
+				// }
+				// pChr->SetNinjaActivationDir(vec2(0, 0));
+				// pChr->SetNinjaActivationTick(-500);
+				// pChr->SetNinjaCurrentMoveTime(0);
+				// if(Sound)
+				// {
+				// 	pChr->SetLastWeapon(WEAPON_GUN);
+				// 	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR, pChr->TeamMask());
+				// }
+				// if(pChr->GetActiveWeapon() >= WEAPON_SHOTGUN)
+				// 	pChr->SetActiveWeapon(WEAPON_HAMMER);
+
+				if(pChr->IncreaseArmor(1))
 				{
-					if(pChr->GetWeaponGot(j))
-					{
-						pChr->SetWeaponGot(j, false);
-						pChr->SetWeaponAmmo(j, 0);
-						Sound = true;
-					}
+					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+					RespawnTime = 50; //todo, not hardcode >:(
 				}
-				pChr->SetNinjaActivationDir(vec2(0, 0));
-				pChr->SetNinjaActivationTick(-500);
-				pChr->SetNinjaCurrentMoveTime(0);
-				if(Sound)
-				{
-					pChr->SetLastWeapon(WEAPON_GUN);
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR, pChr->TeamMask());
-				}
-				if(pChr->GetActiveWeapon() >= WEAPON_SHOTGUN)
-					pChr->SetActiveWeapon(WEAPON_HAMMER);
 				break;
 
 			case POWERUP_ARMOR_SHOTGUN:
@@ -130,9 +159,11 @@ void CPickup::Tick()
 
 			case POWERUP_WEAPON:
 
-				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS && (!pChr->GetWeaponGot(m_Subtype) || pChr->GetWeaponAmmo(m_Subtype) != -1))
+				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS && (!pChr->GetWeaponGot(m_Subtype) ||
+					(pChr->GetWeaponAmmo(m_Subtype) != -1 && pChr->GetWeaponAmmo(m_Subtype) != 10)))
 				{
-					pChr->GiveWeapon(m_Subtype);
+					RespawnTime = 50;
+					pChr->GiveWeapon(m_Subtype, false, 10);
 
 					if(m_Subtype == WEAPON_GRENADE)
 						GameServer()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE, pChr->TeamMask());
@@ -155,6 +186,15 @@ void CPickup::Tick()
 			default:
 				break;
 			};
+		
+		if(RespawnTime >= 0)
+		{
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "pickup player='%d:%s' item=%d/%d",
+				pChr->GetPlayer()->GetCid(), Server()->ClientName(pChr->GetPlayer()->GetCid()), m_Type, m_Subtype);
+			GameServer()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+			m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * RespawnTime;
+		}
 		}
 	}
 }
@@ -165,7 +205,7 @@ void CPickup::TickPaused()
 
 void CPickup::Snap(int SnappingClient)
 {
-	if(NetworkClipped(SnappingClient))
+	if(m_SpawnTick != -1 || NetworkClipped(SnappingClient))
 		return;
 
 	int SnappingClientVersion = GameServer()->GetClientVersion(SnappingClient);

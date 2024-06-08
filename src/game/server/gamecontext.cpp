@@ -30,6 +30,7 @@
 
 #include "entities/character.h"
 #include "gamemodes/DDRace.h"
+#include "gamemodes/ctf.h"
 #include "gamemodes/gctf.h"
 #include "gamemodes/gdm.h"
 #include "gamemodes/gtdm.h"
@@ -3819,11 +3820,11 @@ void CGameContext::OnInit(const void *pPersistentData)
 	for(int i = 0; i < NUM_TUNEZONES; i++)
 	{
 		TuningList()[i] = TuningParams;
-		TuningList()[i].Set("gun_curvature", 0);
-		TuningList()[i].Set("gun_speed", 1400);
-		TuningList()[i].Set("shotgun_curvature", 0);
-		TuningList()[i].Set("shotgun_speed", 500);
-		TuningList()[i].Set("shotgun_speeddiff", 0);
+		TuningList()[i].Set("gun_speed", 2200);
+		TuningList()[i].Set("gun_curvature", 1.25f);
+		TuningList()[i].Set("shotgun_speed", 2750);
+		TuningList()[i].Set("shotgun_speeddiff", 0.8f);
+		TuningList()[i].Set("shotgun_curvature", 1.25f);
 	}
 
 	for(int i = 0; i < NUM_TUNEZONES; i++)
@@ -3839,11 +3840,11 @@ void CGameContext::OnInit(const void *pPersistentData)
 	}
 	else
 	{
-		Tuning()->Set("gun_speed", 1400);
-		Tuning()->Set("gun_curvature", 0);
-		Tuning()->Set("shotgun_speed", 500);
-		Tuning()->Set("shotgun_speeddiff", 0);
-		Tuning()->Set("shotgun_curvature", 0);
+		Tuning()->Set("gun_speed", 2200);
+		Tuning()->Set("gun_curvature", 1.25f);
+		Tuning()->Set("shotgun_speed", 2750);
+		Tuning()->Set("shotgun_speeddiff", 0.8f);
+		Tuning()->Set("shotgun_curvature", 1.25f);
 	}
 
 	if(g_Config.m_SvDDRaceTuneReset)
@@ -3884,6 +3885,8 @@ void CGameContext::OnInit(const void *pPersistentData)
 
 	if(!str_comp(Config()->m_SvGametype, "mod"))
 		m_pController = new CGameControllerMod(this);
+	else if(!str_comp_nocase(Config()->m_SvGametype, "ctf"))
+		m_pController = new CGameControllerCTF(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "gctf"))
 		m_pController = new CGameControllerGCTF(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "ictf"))
@@ -4533,11 +4536,11 @@ void CGameContext::ResetTuning()
 {
 	CTuningParams TuningParams;
 	m_Tuning = TuningParams;
-	Tuning()->Set("gun_speed", 1400);
-	Tuning()->Set("gun_curvature", 0);
-	Tuning()->Set("shotgun_speed", 500);
-	Tuning()->Set("shotgun_speeddiff", 0);
-	Tuning()->Set("shotgun_curvature", 0);
+	Tuning()->Set("gun_speed", 2200);
+	Tuning()->Set("gun_curvature", 1.25f);
+	Tuning()->Set("shotgun_speed", 2750);
+	Tuning()->Set("shotgun_speeddiff", 0.8f);
+	Tuning()->Set("shotgun_curvature", 1.25f);
 	SendTuningParams(-1);
 }
 

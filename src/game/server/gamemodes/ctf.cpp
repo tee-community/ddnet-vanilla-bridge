@@ -17,6 +17,8 @@ CGameControllerCTF::CGameControllerCTF(class CGameContext *pGameServer) :
 
 	m_apFlags[0] = 0;
 	m_apFlags[1] = 0;
+
+	m_pGameType = "CTF";
 }
 
 CGameControllerCTF::~CGameControllerCTF() = default;
@@ -30,7 +32,129 @@ void CGameControllerCTF::Tick()
 
 void CGameControllerCTF::OnCharacterSpawn(class CCharacter *pChr)
 {
-	CGameControllerInstagib::OnCharacterSpawn(pChr);
+	OnCharacterConstruct(pChr);
+
+	pChr->SetTeams(&Teams());
+	Teams().OnCharacterSpawn(pChr->GetPlayer()->GetCid());
+
+	// default health
+	pChr->IncreaseHealth(10);
+
+	pChr->ResetPickups();
+
+	pChr->GiveWeapon(WEAPON_GUN, false, 10);
+	pChr->GiveWeapon(WEAPON_HAMMER);
+}
+
+bool CGameControllerCTF::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From, int &Weapon, CCharacter &Character)
+{
+	if(Character.m_IsGodmode)
+	{
+		Dmg = 0;
+		return false;
+	}
+	// TODO: ddnet-insta cfg team damage
+	// if(GameServer()->m_pController->IsFriendlyFire(Character.GetPlayer()->GetCid(), From) && !g_Config.m_SvTeamdamage)
+	if(GameServer()->m_pController->IsFriendlyFire(Character.GetPlayer()->GetCid(), From))
+		return false;
+
+	if(g_Config.m_SvOnlyHookKills && From >= 0 && From <= MAX_CLIENTS)
+	{
+		CCharacter *pChr = GameServer()->m_apPlayers[From]->GetCharacter();
+		if(!pChr || pChr->GetCore().HookedPlayer() != Character.GetPlayer()->GetCid())
+			Dmg = 0;
+	}
+
+	if(From == Character.GetPlayer()->GetCid())
+		Dmg = std::max(1, Dmg/2);
+	
+	if(Dmg)
+	{
+		if(Character.m_Armor)
+		{
+			if(Dmg > 1)
+			{
+				Character.m_Health--;
+				Dmg--;
+			}
+
+			if(Dmg > Character.m_Armor)
+			{
+				Dmg -= Character.m_Armor;
+				Character.m_Armor = 0;
+			}
+			else
+			{
+				Character.m_Armor -= Dmg;
+				Dmg = 0;
+			}
+		}
+
+		Character.m_Health -= Dmg;
+	}
+
+	if(From >= 0 && From != Character.GetPlayer()->GetCid() && GameServer()->m_apPlayers[From])
+	{
+		// do damage Hit sound
+		CClientMask Mask = CClientMask().set(From);
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS && GameServer()->m_apPlayers[i]->m_SpectatorId == From)
+				Mask.set(i);
+			
+			// if(gaem)
+		}
+		GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+	}
+
+	// check for death
+	if(Character.m_Health <= 0)
+	{
+		Character.Die(From, Weapon);
+
+		if(From >= 0 && From != Character.GetPlayer()->GetCid() && GameServer()->m_apPlayers[From])
+		{
+			CCharacter *pChr = GameServer()->m_apPlayers[From]->GetCharacter();
+			if(pChr)
+			{
+				// set attacker's face to happy (taunt!)
+				pChr->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed());
+
+				// refill nades
+				int RefillNades = 0;
+				if(g_Config.m_SvGrenadeAmmoRegenOnKill == 1)
+					RefillNades = 1;
+				else if(g_Config.m_SvGrenadeAmmoRegenOnKill == 2)
+					RefillNades = g_Config.m_SvGrenadeAmmoRegenNum;
+				if(RefillNades && g_Config.m_SvGrenadeAmmoRegen && Weapon == WEAPON_GRENADE)
+				{
+					pChr->SetWeaponAmmo(WEAPON_GRENADE, minimum(pChr->GetCore().m_aWeapons[WEAPON_GRENADE].m_Ammo + RefillNades, g_Config.m_SvGrenadeAmmoRegenNum));
+				}
+			}
+
+			// do damage Hit sound
+			CClientMask Mask = CClientMask().set(From);
+			for(int i = 0; i < MAX_CLIENTS; i++)
+			{
+				if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS && GameServer()->m_apPlayers[i]->m_SpectatorId == From)
+					Mask.set(i);
+			}
+			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
+		}
+		return false;
+	}
+
+	if (Dmg > 2)
+		GameServer()->CreateSound(Character.GetPos(), SOUND_PLAYER_PAIN_LONG);
+	else
+		GameServer()->CreateSound(Character.GetPos(), SOUND_PLAYER_PAIN_SHORT);
+
+	if(Dmg)
+	{
+		Character.SetEmote(EMOTE_PAIN, Server()->Tick() + 500 * Server()->TickSpeed() / 1000);
+	}
+
+	return false;
 }
 
 int CGameControllerCTF::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int WeaponId)

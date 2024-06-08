@@ -100,6 +100,7 @@ public:
 	void ApplyMoveRestrictions();
 
 private:
+	friend class CGameControllerCTF;
 	// player controlling this character
 	class CPlayer *m_pPlayer;
 

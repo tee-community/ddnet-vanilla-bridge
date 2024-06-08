@@ -539,14 +539,43 @@ void CCharacter::FireWeapon()
 
 	case WEAPON_SHOTGUN:
 	{
-		float LaserReach;
-		if(!m_TuneZone)
-			LaserReach = Tuning()->m_LaserReach;
-		else
-			LaserReach = TuningList()[m_TuneZone].m_LaserReach;
+		int ShotSpread = 2;
 
-		new CLaser(&GameServer()->m_World, m_Pos, Direction, LaserReach, m_pPlayer->GetCid(), WEAPON_SHOTGUN);
-		GameServer()->CreateSound(m_Pos, SOUND_SHOTGUN_FIRE, TeamMask()); // NOLINT(clang-analyzer-unix.Malloc)
+		for(int i = -ShotSpread; i <= ShotSpread; ++i)
+		{
+			float Spreading[] = {-0.185f, -0.070f, 0, 0.070f, 0.185f};
+			float a = 0;
+			if(Direction.x != 0 || Direction.y != 0)
+			{
+				a = atanf(Direction.y/Direction.x);
+				if(Direction.x < 0)
+					a = a+pi;
+			}
+			a += Spreading[i+2];
+			float v = 1-(absolute(i)/(float)ShotSpread);
+			float Speed = mix((float)GameServer()->Tuning()->m_ShotgunSpeeddiff, 1.0f, v);
+			// CProjectile *pProj = new CProjectile(GameWorld(), WEAPON_SHOTGUN,
+			// 	m_pPlayer->GetCID(),
+			// 	ProjStartPos,
+			// 	vec2(cosf(a), sinf(a))*Speed,
+			// 	(int)(Server()->TickSpeed()*GameServer()->Tuning()->m_ShotgunLifetime),
+			// 	1, 0, 0, -1, WEAPON_SHOTGUN);
+			
+			new CProjectile(
+				GameWorld(),
+				WEAPON_SHOTGUN, //Type
+				m_pPlayer->GetCid(), //Owner
+				ProjStartPos, //Pos
+				direction(a)*Speed, //Dir
+				(int)(Server()->TickSpeed()*GameServer()->Tuning()->m_ShotgunLifetime), //Span
+				false, //Freeze
+				false, //Explosive
+				-1, //SoundImpact
+				vec2(cosf(a), sinf(a))*Speed // MouseTarget
+			);
+		}
+
+		GameServer()->CreateSound(m_Pos, SOUND_SHOTGUN_FIRE);
 	}
 	break;
 
@@ -1132,6 +1161,11 @@ void CCharacter::SnapCharacter(int SnappingClient, int Id)
 			AmmoCount = (m_FreezeTime == 0) ? m_Core.m_aWeapons[m_Core.m_ActiveWeapon].m_Ammo : 0;
 	}
 
+	if(Weapon >= 0 && Weapon < NUM_WEAPONS)
+	{
+		AmmoCount = GetWeaponAmmo(Weapon);
+	}
+
 	if(GetPlayer()->IsAfk() || GetPlayer()->IsPaused())
 	{
 		if(m_FreezeTime > 0 || m_Core.m_DeepFrozen || m_Core.m_LiveFrozen)
@@ -1168,7 +1202,7 @@ void CCharacter::SnapCharacter(int SnappingClient, int Id)
 		pCharacter->m_Weapon = Weapon;
 		pCharacter->m_AmmoCount = AmmoCount;
 		pCharacter->m_Health = Health;
-		pCharacter->m_Armor = Armor;
+		pCharacter->m_Armor = m_Armor;
 		pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
 	}
 	else
@@ -2122,7 +2156,7 @@ void CCharacter::ForceSetRescue(int RescueMode)
 void CCharacter::DDRaceTick()
 {
 	mem_copy(&m_Input, &m_SavedInput, sizeof(m_Input));
-	m_Armor = clamp(10 - (m_FreezeTime / 15), 0, 10);
+	// m_Armor = clamp(10 - (m_FreezeTime / 15), 0, 10);
 	if(m_Input.m_Direction != 0 || m_Input.m_Jump != 0)
 		m_LastMove = Server()->Tick();
 
