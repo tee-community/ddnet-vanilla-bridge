@@ -65,32 +65,48 @@ bool CGameControllerCTF::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From,
 			Dmg = 0;
 	}
 
+	int damage = Dmg;
+
 	if(From == Character.GetPlayer()->GetCid())
-		Dmg = std::max(1, Dmg/2);
+		damage = std::max(1, damage/2);
 	
-	if(Dmg)
+	Character.m_DamageTaken++;
+
+	// create healthmod indicator
+	if(Server()->Tick() < Character.m_DamageTakenTick+25)
+	{
+		// make sure that the damage indicators doesn't group together
+		GameServer()->CreateDamageInd(Character.m_Pos, Character.m_DamageTaken*0.25f, Dmg);
+	}
+	else
+	{
+		Character.m_DamageTaken = 0;
+		GameServer()->CreateDamageInd(Character.m_Pos, 0, Dmg);
+	}
+	
+	if(damage)
 	{
 		if(Character.m_Armor)
 		{
-			if(Dmg > 1)
+			if(damage > 1)
 			{
 				Character.m_Health--;
-				Dmg--;
+				damage--;
 			}
 
-			if(Dmg > Character.m_Armor)
+			if(damage > Character.m_Armor)
 			{
-				Dmg -= Character.m_Armor;
+				damage -= Character.m_Armor;
 				Character.m_Armor = 0;
 			}
 			else
 			{
-				Character.m_Armor -= Dmg;
-				Dmg = 0;
+				Character.m_Armor -= damage;
+				damage = 0;
 			}
 		}
 
-		Character.m_Health -= Dmg;
+		Character.m_Health -= damage;
 	}
 
 	if(From >= 0 && From != Character.GetPlayer()->GetCid() && GameServer()->m_apPlayers[From])
@@ -144,12 +160,12 @@ bool CGameControllerCTF::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From,
 		return false;
 	}
 
-	if (Dmg > 2)
+	if (damage > 2)
 		GameServer()->CreateSound(Character.GetPos(), SOUND_PLAYER_PAIN_LONG);
 	else
 		GameServer()->CreateSound(Character.GetPos(), SOUND_PLAYER_PAIN_SHORT);
 
-	if(Dmg)
+	if(damage)
 	{
 		Character.SetEmote(EMOTE_PAIN, Server()->Tick() + 500 * Server()->TickSpeed() / 1000);
 	}

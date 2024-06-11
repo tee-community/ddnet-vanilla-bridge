@@ -261,7 +261,7 @@ void CProjectile::Tick()
 		}
 		else if(m_Type == WEAPON_GUN || m_Type == WEAPON_SHOTGUN)
 		{
-			GameServer()->CreateDamageInd(CurPos, -std::atan2(m_Direction.x, m_Direction.y), 10, (m_Owner != -1) ? TeamMask : CClientMask().set());
+			// GameServer()->CreateDamageInd(CurPos, -std::atan2(m_Direction.x, m_Direction.y), 10, (m_Owner != -1) ? TeamMask : CClientMask().set());
 			if(pTargetChr)
 				pTargetChr->TakeDamage(vec2(0,0), 1, m_Owner, m_Type);
 			m_MarkedForDestroy = true;

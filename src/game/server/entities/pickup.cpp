@@ -102,7 +102,7 @@ void CPickup::Tick()
 
 				if(pChr->IncreaseArmor(1))
 				{
-					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
 					RespawnTime = 50; //todo, not hardcode >:(
 				}
 				break;

@@ -429,7 +429,16 @@ void CCharacter::FireWeapon()
 
 	// check for ammo
 	if(!m_Core.m_aWeapons[m_Core.m_ActiveWeapon].m_Ammo)
+	{
+		// 125ms is a magical limit of how fast a human can click
+		m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
+		if(m_LastNoAmmoSound+Server()->TickSpeed() <= Server()->Tick())
+		{
+			GameServer()->CreateSound(m_Pos, SOUND_WEAPON_NOAMMO);
+			m_LastNoAmmoSound = Server()->Tick();
+		}
 		return;
+	}
 
 	// ddnet-insta
 	if(g_Config.m_SvGrenadeAmmoRegenResetOnFire)
