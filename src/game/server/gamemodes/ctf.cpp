@@ -109,6 +109,8 @@ bool CGameControllerCTF::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From,
 		Character.m_Health -= damage;
 	}
 
+	Character.m_DamageTakenTick = Server()->Tick();
+
 	if(From >= 0 && From != Character.GetPlayer()->GetCid() && GameServer()->m_apPlayers[From])
 	{
 		// do damage Hit sound
@@ -179,7 +181,9 @@ int CGameControllerCTF::OnCharacterDeath(class CCharacter *pVictim, class CPlaye
 	int HadFlag = 0;
 
 	if(WeaponId == WEAPON_SELF)
+	{
 		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick() + Server()->TickSpeed() * 3.0f;
+	}
 	else
 		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick() + Server()->TickSpeed() * 0.5f;
 
