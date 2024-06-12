@@ -65,6 +65,11 @@ bool CGameControllerCTF::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From,
 			Dmg = 0;
 	}
 
+	if(WEAPON_LASER == Weapon)
+	{
+		Dmg = 5;
+	}
+
 	int damage = Dmg;
 
 	if(From == Character.GetPlayer()->GetCid())

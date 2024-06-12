@@ -1211,7 +1211,7 @@ void CCharacter::SnapCharacter(int SnappingClient, int Id)
 		pCharacter->m_Weapon = Weapon;
 		pCharacter->m_AmmoCount = AmmoCount;
 		pCharacter->m_Health = Health;
-		pCharacter->m_Armor = m_Armor;
+		pCharacter->m_Armor = Armor;
 		pCharacter->m_PlayerFlags = GetPlayer()->m_PlayerFlags;
 	}
 	else
