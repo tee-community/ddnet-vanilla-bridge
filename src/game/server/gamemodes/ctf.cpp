@@ -178,6 +178,11 @@ int CGameControllerCTF::OnCharacterDeath(class CCharacter *pVictim, class CPlaye
 	CGameControllerInstagib::OnCharacterDeath(pVictim, pKiller, WeaponId);
 	int HadFlag = 0;
 
+	if(WeaponId == WEAPON_SELF)
+		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick() + Server()->TickSpeed() * 3.0f;
+	else
+		pVictim->GetPlayer()->m_RespawnTick = Server()->Tick() + Server()->TickSpeed() * 0.5f;
+
 	// drop flags
 	for(auto &F : m_apFlags)
 	{
