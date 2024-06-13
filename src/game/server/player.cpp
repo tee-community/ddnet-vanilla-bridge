@@ -755,6 +755,7 @@ void CPlayer::SetAfk(bool Afk)
 {
 	if(m_Afk != Afk)
 	{
+		SetTeam(TEAM_SPECTATORS);
 		Server()->ExpireServerInfo();
 		m_Afk = Afk;
 	}
