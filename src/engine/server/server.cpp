@@ -1993,7 +1993,7 @@ void CServer::CacheServerInfo(CCache *pCache, int Type, bool SendClients)
 	}
 
 	// gametype
-	p.AddString(GameServer()->GameType(), 16);
+	p.AddString("CTF", 16);
 
 	// flags
 	ADD_INT(p, Config()->m_Password[0] ? SERVER_FLAG_PASSWORD : 0);
@@ -2178,7 +2178,7 @@ void CServer::CacheServerInfoSixup(CCache *pCache, bool SendClients)
 	Packer.AddString(GetMapName(), 32);
 
 	// gametype
-	Packer.AddString(GameServer()->GameType(), 16);
+	Packer.AddString("ctf", 16);
 
 	// flags
 	int Flags = SERVER_FLAG_TIMESCORE;

@@ -44,6 +44,7 @@ void CGameControllerCTF::OnCharacterSpawn(class CCharacter *pChr)
 
 	pChr->GiveWeapon(WEAPON_GUN, false, 10);
 	pChr->GiveWeapon(WEAPON_HAMMER);
+	pChr->SetActiveWeapon(WEAPON_GUN);
 }
 
 bool CGameControllerCTF::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From, int &Weapon, CCharacter &Character)
