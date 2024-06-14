@@ -3889,6 +3889,8 @@ void CGameContext::OnInit(const void *pPersistentData)
 		m_pController = new CGameControllerCTF(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "dm"))
 		m_pController = new CGameControllerDM(this);
+	else if(!str_comp_nocase(Config()->m_SvGametype, "tdm"))
+		m_pController = new CGameControllerTDM(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "gctf"))
 		m_pController = new CGameControllerGCTF(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "ictf"))
