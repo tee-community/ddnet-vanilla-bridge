@@ -63,7 +63,7 @@ void CPickup::Tick()
 		{
 			if(m_Layer == LAYER_SWITCH && m_Number > 0 && !Switchers()[m_Number].m_aStatus[pChr->Team()])
 				continue;
-			bool Sound = false;
+			// bool Sound = false;
 			// player picked us up, is someone was hooking us, let them go
 			switch(m_Type)
 			{
