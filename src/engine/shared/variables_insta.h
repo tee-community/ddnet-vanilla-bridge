@@ -32,6 +32,8 @@ MACRO_CONFIG_INT(SvKillingspreeKills, sv_killingspree_kills, 0, 0, 20, CFGFLAG_S
 MACRO_CONFIG_INT(SvDamageNeededForKill, sv_damage_needed_for_kill, 4, 0, 5, CFGFLAG_SERVER, "Damage needed to kill")
 MACRO_CONFIG_INT(SvAllowZoom, sv_allow_zoom, 0, 0, 1, CFGFLAG_SERVER, "allow ddnet clients to use the client side zoom feature")
 MACRO_CONFIG_STR(SvSpawnWeapons, sv_spawn_weapons, 900, "grenade", CFGFLAG_SERVER, "possible values: grenade, laser")
+
+MACRO_CONFIG_INT(SvSpawnNinja, sv_spawn_ninja, 1, 0, 1, CFGFLAG_SERVER, "enable or disble ninja spawning")
 /*
 
 sv_chat_ratelimit_long_messages

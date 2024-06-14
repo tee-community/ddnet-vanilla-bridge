@@ -342,7 +342,6 @@ bool IGameController::OnEntity(int Index, int x, int y, int Layer, int Flags, bo
 	{
 		Type = POWERUP_WEAPON;
 		SubType = WEAPON_SHOTGUN;
-		return true;
 	}
 	else if(Index == ENTITY_WEAPON_GRENADE)
 	{

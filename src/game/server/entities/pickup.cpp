@@ -10,6 +10,8 @@
 #include <game/server/gamecontext.h>
 #include <game/server/player.h>
 
+#include <engine/shared/config.h>
+
 static constexpr int gs_PickupPhysSize = 14;
 
 CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType, int Layer, int Number) :
@@ -51,6 +53,9 @@ void CPickup::Tick()
 			return;
 	}
 
+	if(!Config()->m_SvSpawnNinja && m_Type == POWERUP_NINJA)
+		m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * 90;
+
 	Move();
 
 	// Check if a player intersected us
@@ -76,7 +81,7 @@ void CPickup::Tick()
 				if(pChr->IncreaseHealth(1))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-					RespawnTime = 30; //todo, not hardcode >:(
+					RespawnTime = 15; //todo, not hardcode >:(
 				}
 				break;
 
@@ -106,7 +111,7 @@ void CPickup::Tick()
 				if(pChr->IncreaseArmor(1))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-					RespawnTime = 30; //todo, not hardcode >:(
+					RespawnTime = 15; //todo, not hardcode >:(
 				}
 				break;
 
@@ -165,7 +170,7 @@ void CPickup::Tick()
 				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS && (!pChr->GetWeaponGot(m_Subtype) ||
 					(pChr->GetWeaponAmmo(m_Subtype) != -1 && pChr->GetWeaponAmmo(m_Subtype) != 10)))
 				{
-					RespawnTime = 30;
+					RespawnTime = 15;
 					pChr->GiveWeapon(m_Subtype, false, 10);
 
 					if(m_Subtype == WEAPON_GRENADE)

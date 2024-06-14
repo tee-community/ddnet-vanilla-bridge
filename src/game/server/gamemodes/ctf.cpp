@@ -88,7 +88,7 @@ bool CGameControllerCTF::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From,
 	else
 	{
 		Character.m_DamageTaken = 0;
-		GameServer()->CreateDamageInd(Character.m_Pos, 0, Dmg);
+		GameServer()->CreateDamageInd(Character.m_Pos, 0, damage);
 	}
 	
 	if(damage)
