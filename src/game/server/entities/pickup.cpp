@@ -32,7 +32,7 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType, int Layer, int N
 
 void CPickup::Reset()
 {
-	m_MarkedForDestroy = false;
+	m_MarkedForDestroy = true;
 }
 
 void CPickup::Tick()
