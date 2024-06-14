@@ -4,9 +4,12 @@
 #include "dm.h"
 
 CGameControllerDM::CGameControllerDM(class CGameContext *pGameServer) :
-	CGameControllerInstagib(pGameServer)
+	CGameControllerCTF(pGameServer)
 {
-	m_GameFlags = GAMEFLAG_FLAGS;
+	m_GameFlags = 0;
+	m_GameFlags_v7 = 0;
+
+	m_pGameType = "DM";
 }
 
 CGameControllerDM::~CGameControllerDM() = default;
@@ -18,8 +21,19 @@ void CGameControllerDM::Tick()
 
 void CGameControllerDM::OnCharacterSpawn(class CCharacter *pChr)
 {
-	CGameControllerInstagib::OnCharacterSpawn(pChr);
+	CGameControllerCTF::OnCharacterSpawn(pChr);
 }
+
+bool CGameControllerDM::OnEntity(int Index, int x, int y, int Layer, int Flags, bool Initial, int Number)
+{
+	return CGameControllerInstagib::OnEntity(Index, x, y, Layer, Flags, Initial, Number);
+}
+
+bool CGameControllerDM::OnCharacterTakeDamage(vec2 &Force, int &Dmg, int &From, int &Weapon, CCharacter &Character)
+{
+	return CGameControllerCTF::OnCharacterTakeDamage(Force, Dmg, From, Weapon, Character);
+}
+
 
 int CGameControllerDM::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int WeaponId)
 {

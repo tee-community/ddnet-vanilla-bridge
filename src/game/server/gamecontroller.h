@@ -73,6 +73,7 @@ protected:
 
 public:
 	const char *m_pGameType;
+	int m_GameFlags_v7;
 
 	IGameController(class CGameContext *pGameServer);
 	virtual ~IGameController();

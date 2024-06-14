@@ -1501,7 +1501,7 @@ void CGameContext::OnClientEnter(int ClientId)
 		{
 			protocol7::CNetMsg_Sv_GameInfo Msg;
 			Msg.m_GameFlags = protocol7::GAMEFLAG_RACE;
-			Msg.m_GameFlags = protocol7::GAMEFLAG_TEAMS | protocol7::GAMEFLAG_FLAGS; // ddnet-insta
+			Msg.m_GameFlags = m_pController->m_GameFlags_v7; // ddnet-cfg
 			Msg.m_MatchCurrent = 1;
 			Msg.m_MatchNum = 0;
 			Msg.m_ScoreLimit = Config()->m_SvScorelimit; // ddnet-insta
@@ -3887,6 +3887,8 @@ void CGameContext::OnInit(const void *pPersistentData)
 		m_pController = new CGameControllerMod(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "ctf"))
 		m_pController = new CGameControllerCTF(this);
+	else if(!str_comp_nocase(Config()->m_SvGametype, "dm"))
+		m_pController = new CGameControllerDM(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "gctf"))
 		m_pController = new CGameControllerGCTF(this);
 	else if(!str_comp_nocase(Config()->m_SvGametype, "ictf"))
