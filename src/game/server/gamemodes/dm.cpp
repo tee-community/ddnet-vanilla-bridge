@@ -9,7 +9,7 @@ CGameControllerDM::CGameControllerDM(class CGameContext *pGameServer) :
 	m_GameFlags = 0;
 	m_GameFlags_v7 = 0;
 
-	m_pGameType = "DM";
+	m_pGameType = "DM+";
 }
 
 CGameControllerDM::~CGameControllerDM() = default;

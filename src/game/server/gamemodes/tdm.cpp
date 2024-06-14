@@ -10,7 +10,7 @@ CGameControllerTDM::CGameControllerTDM(class CGameContext *pGameServer) :
 
 	m_GameFlags_v7 = protocol7::GAMEFLAG_TEAMS;
 
-	m_pGameType = "TDM";
+	m_pGameType = "TDM+";
 }
 
 CGameControllerTDM::~CGameControllerTDM() = default;
