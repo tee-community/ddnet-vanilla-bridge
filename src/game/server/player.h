@@ -76,6 +76,9 @@ public:
 	int m_TuneZone;
 	int m_TuneZoneOld;
 
+	/* ddnet-cfg */
+	int m_TicksAlive;
+
 	// states if the client is chatting, accessing a menu etc.
 	int m_PlayerFlags;
 

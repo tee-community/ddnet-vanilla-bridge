@@ -24,12 +24,15 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, int SubType, int Layer, int N
 
 	m_SpawnTick = -1;
 
+	if(m_Type == POWERUP_NINJA)
+		m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * 90;
+
 	GameWorld()->InsertEntity(this);
 }
 
 void CPickup::Reset()
 {
-	m_MarkedForDestroy = true;
+	m_MarkedForDestroy = false;
 }
 
 void CPickup::Tick()
@@ -73,7 +76,7 @@ void CPickup::Tick()
 				if(pChr->IncreaseHealth(1))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-					RespawnTime = 50; //todo, not hardcode >:(
+					RespawnTime = 15; //todo, not hardcode >:(
 				}
 				break;
 
@@ -103,7 +106,7 @@ void CPickup::Tick()
 				if(pChr->IncreaseArmor(1))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-					RespawnTime = 50; //todo, not hardcode >:(
+					RespawnTime = 15; //todo, not hardcode >:(
 				}
 				break;
 
@@ -162,7 +165,7 @@ void CPickup::Tick()
 				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS && (!pChr->GetWeaponGot(m_Subtype) ||
 					(pChr->GetWeaponAmmo(m_Subtype) != -1 && pChr->GetWeaponAmmo(m_Subtype) != 10)))
 				{
-					RespawnTime = 50;
+					RespawnTime = 15;
 					pChr->GiveWeapon(m_Subtype, false, 10);
 
 					if(m_Subtype == WEAPON_GRENADE)
@@ -181,6 +184,20 @@ void CPickup::Tick()
 			{
 				// activate ninja on target player
 				pChr->GiveNinja();
+
+				CClientMask mask;
+				GameServer()->CreateSound(m_Pos, SOUND_PICKUP_NINJA, pChr->TeamMask());
+
+				RespawnTime = 90;
+
+				CCharacter *pC = static_cast<CCharacter *>(GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
+					for(; pC; pC = (CCharacter *)pC->TypeNext())
+					{
+						if (pC != pChr)
+							pC->SetEmote(EMOTE_SURPRISE, Server()->Tick() + Server()->TickSpeed());
+					}
+
+					pChr->SetEmote(EMOTE_ANGRY, Server()->Tick() + 1200 * Server()->TickSpeed() / 1000);
 				break;
 			}
 			default:

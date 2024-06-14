@@ -342,8 +342,6 @@ bool IGameController::OnEntity(int Index, int x, int y, int Layer, int Flags, bo
 	{
 		Type = POWERUP_WEAPON;
 		SubType = WEAPON_SHOTGUN;
-		CPickup *pPickup = new CPickup(&GameServer()->m_World, Type, SubType, Layer, Number);
-		pPickup->m_Pos = Pos;
 		return true;
 	}
 	else if(Index == ENTITY_WEAPON_GRENADE)

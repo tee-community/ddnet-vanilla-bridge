@@ -123,6 +123,7 @@ void CPlayer::Reset()
 	m_LastPause = 0;
 	m_Score.reset();
 	m_Score = 0; // ddnet-insta
+	m_TicksAlive = 0;
 
 	// Variable initialized:
 	m_Last_Team = 0;
@@ -168,6 +169,7 @@ static int PlayerFlags_SixToSeven(int Flags)
 
 void CPlayer::Tick()
 {
+	m_TicksAlive++;
 	if(m_ScoreQueryResult != nullptr && m_ScoreQueryResult->m_Completed && m_SentSnaps >= 3)
 	{
 		ProcessScoreResult(*m_ScoreQueryResult);
@@ -755,7 +757,7 @@ void CPlayer::SetAfk(bool Afk)
 {
 	if(m_Afk != Afk)
 	{
-		if(m_FirstVoteTick < Server()->Tick())
+		if(m_TicksAlive > Server()->TickSpeed() * 10)
 			SetTeam(TEAM_SPECTATORS);
 		Server()->ExpireServerInfo();
 		m_Afk = Afk;
