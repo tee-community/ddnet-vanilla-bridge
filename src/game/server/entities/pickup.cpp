@@ -76,7 +76,7 @@ void CPickup::Tick()
 				if(pChr->IncreaseHealth(1))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-					RespawnTime = 15; //todo, not hardcode >:(
+					RespawnTime = 30; //todo, not hardcode >:(
 				}
 				break;
 
@@ -106,7 +106,7 @@ void CPickup::Tick()
 				if(pChr->IncreaseArmor(1))
 				{
 					GameServer()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-					RespawnTime = 15; //todo, not hardcode >:(
+					RespawnTime = 30; //todo, not hardcode >:(
 				}
 				break;
 
@@ -165,7 +165,7 @@ void CPickup::Tick()
 				if(m_Subtype >= 0 && m_Subtype < NUM_WEAPONS && (!pChr->GetWeaponGot(m_Subtype) ||
 					(pChr->GetWeaponAmmo(m_Subtype) != -1 && pChr->GetWeaponAmmo(m_Subtype) != 10)))
 				{
-					RespawnTime = 15;
+					RespawnTime = 30;
 					pChr->GiveWeapon(m_Subtype, false, 10);
 
 					if(m_Subtype == WEAPON_GRENADE)
