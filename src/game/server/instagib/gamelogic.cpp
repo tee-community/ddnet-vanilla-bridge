@@ -60,8 +60,8 @@ void CGameContext::ShowCurrentInstagibConfigsMotd(int ClientId, bool Force) cons
 	else
 		str_append(aMotd, "* ready mode: off\n");
 
-	str_format(aBuf, sizeof(aBuf), "* damage needed for kill: %d\n", g_Config.m_SvDamageNeededForKill);
-	str_append(aMotd, aBuf);
+	// str_format(aBuf, sizeof(aBuf), "* damage needed for kill: %d\n", g_Config.m_SvDamageNeededForKill);
+	// str_append(aMotd, aBuf);
 
 	str_format(aBuf, sizeof(aBuf), "* allow spec public chat: %s\n", g_Config.m_SvTournamentChat ? "no" : "yes");
 	str_append(aMotd, aBuf);
