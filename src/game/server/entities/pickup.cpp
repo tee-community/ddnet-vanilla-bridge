@@ -223,6 +223,7 @@ void CPickup::Tick()
 
 void CPickup::TickPaused()
 {
+	m_SpawnTick++;
 }
 
 void CPickup::Snap(int SnappingClient)
