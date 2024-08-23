@@ -4,7 +4,7 @@
 #define GAME_SERVER_ENTITY_H
 
 #include <base/vmath.h>
-
+#include <engine/shared/protocol.h>
 #include <game/alloc.h>
 
 #include "gameworld.h"
