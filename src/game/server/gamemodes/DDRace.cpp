@@ -131,8 +131,8 @@ void CGameControllerDDRace::OnPlayerConnect(CPlayer *pPlayer)
 		str_format(aBuf, sizeof(aBuf), "'%s' entered and joined the %s", Server()->ClientName(ClientId), GetTeamName(pPlayer->GetTeam()));
 		GameServer()->SendChat(-1, TEAM_ALL, aBuf, -1, CGameContext::CHAT_SIX);
 
-		GameServer()->SendChatTarget(ClientId, "DDNet-ctf https://https://github.com/JSaurusRex/ddnet/tree/vanilla");
-		GameServer()->SendChatTarget(ClientId, "DDraceNetwork Mod. Version: " GAME_VERSION);
+		// GameServer()->SendChatTarget(ClientId, "DDNet-ctf https://https://github.com/JSaurusRex/ddnet/tree/vanilla");
+		// GameServer()->SendChatTarget(ClientId, "DDraceNetwork Mod. Version: " GAME_VERSION);
 
 		GameServer()->AlertOnSpecialInstagibConfigs(ClientId);
 		GameServer()->ShowCurrentInstagibConfigsMotd(ClientId);
